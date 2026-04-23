@@ -14,12 +14,28 @@ class PromptBuilder:
     """提示词构建器"""
 
     @staticmethod
+    def _build_cli_prefix() -> str:
+        """
+        构建CLI模式提示词前缀
+
+        Returns:
+            str: CLI模式前缀提示词
+        """
+        return """Do NOT read files.
+Do NOT use tools.
+Answer only from provided input.
+Be brief.
+Use minimal reasoning. No step-by-step explanation. Output final answer only.
+"""
+
+    @staticmethod
     def build_extraction_prompt(
             operator_doc: str,
             rule_content: str,
             module: str = "",
             json_validation_error: Optional[str] = None,
-            validation_error: Optional[str] = None
+            validation_error: Optional[str] = None,
+            use_cli_mode: bool = False
     ) -> str:
         """
         构建提取提示词（使用基础规则 + 扩展规则）
@@ -30,10 +46,14 @@ class PromptBuilder:
             module: 模块名称（用于构建错误提示）
             json_validation_error: JSON校验错误信息（可选）
             validation_error: 业务校验错误信息（可选）
+            use_cli_mode: 是否使用CLI模式（可选，默认False）
 
         Returns:
             str: 提取提示词
         """
+
+        # 构建CLI模式前缀
+        cli_prefix = PromptBuilder._build_cli_prefix() if use_cli_mode else ""
 
         # 构建错误提示
         json_error_title = ",【JSON解析错误】" if json_validation_error else ""
@@ -45,7 +65,7 @@ class PromptBuilder:
                                                                       validation_error=validation_error)
 
         # 构建基础提示词
-        prompt = f"""
+        prompt = f"""{cli_prefix}
 你是一个"CANN算子文档结构化解析专家"。
 
 你的任务是：
@@ -121,21 +141,26 @@ class PromptBuilder:
             operator_doc: str,
             check_rule_content: str,
             module: str,
-            rule_json_content: str = ""
+            rule_json_content: str = "",
+            use_cli_mode: bool = False
     ) -> str:
         """
         构建校验提示词
 
         Args:
-            extracted_data: 提取的数据
+            operator_doc: 原始算子文档
             check_rule_content: 校验规则内容
             module: 模块名称
             rule_json_content: 已生成的规则文件内容（用于定位错误行号）
+            use_cli_mode: 是否使用CLI模式（可选，默认False）
 
         Returns:
             str: 校验提示词
         """
-        prompt = f"""
+        # 构建CLI模式前缀
+        cli_prefix = PromptBuilder._build_cli_prefix() if use_cli_mode else ""
+
+        prompt = f"""{cli_prefix}
 你是一个“CANN算子结构化数据校验专家”。
 
 你的任务是：
