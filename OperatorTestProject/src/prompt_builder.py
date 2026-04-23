@@ -21,7 +21,8 @@ class PromptBuilder:
         Returns:
             str: CLI模式前缀提示词
         """
-        return """Do NOT read files.
+        return """
+Do NOT read files.
 Do NOT use tools.
 Answer only from provided input.
 Be brief.
