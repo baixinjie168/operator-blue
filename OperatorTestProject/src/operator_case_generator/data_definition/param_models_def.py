@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+"""
 功能：定义数据模型结构
 """
 from dataclasses import dataclass

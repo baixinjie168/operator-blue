@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
+参数范围模型模块
+"""
 import random
 from typing import List
 
