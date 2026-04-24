@@ -126,18 +126,35 @@ class OpenAIInterfaceClient(BaseHTTPClient):
         return headers
 
     def _build_request_body(self, prompt: str, params: LLMParams) -> Dict[str, Any]:
+        # 构建消息列表
+        messages = []
+
+        # 检查是否有系统提示
+        system_prompt = self.config.options.get("system")
+        if system_prompt:
+            messages.append({
+                "role": "system",
+                "content": system_prompt
+            })
+
+        # 添加用户消息
+        messages.append({
+            "role": "user",
+            "content": prompt,
+        })
+
+        # 构建基础请求体
         request_body = {
             "model": self.config.model,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+            "messages": messages,
             "temperature": params.temperature,
             "max_tokens": params.max_tokens,
         }
-        request_body.update(self.config.options)
+
+        # 添加其他选项（排除 system，因为它已经被处理了）
+        other_options = {k: v for k, v in self.config.options.items() if k != "system"}
+        request_body.update(other_options)
+
         return request_body
 
     def _parse_response(self, response_data: Dict[str, Any]) -> str:
@@ -175,6 +192,15 @@ class AnthropicInterfaceClient(BaseHTTPClient):
     def _build_request_body(self, prompt: str, params: LLMParams) -> Dict[str, Any]:
         request_options = dict(self.config.options)
         request_options.pop("anthropic_version", None)
+        content_as_text = bool(request_options.pop("content_as_text", False))
+        system_prompt = request_options.pop("system", None)
+
+        content_value = prompt if content_as_text else [
+            {
+                "type": "text",
+                "text": prompt,
+            }
+        ]
 
         request_body = {
             "model": self.config.model,
@@ -183,10 +209,14 @@ class AnthropicInterfaceClient(BaseHTTPClient):
             "messages": [
                 {
                     "role": "user",
-                    "content": prompt,
+                    "content": content_value,
                 }
             ],
         }
+
+        if system_prompt is not None:
+            request_body["system"] = system_prompt
+
         request_body.update(request_options)
         return request_body
 

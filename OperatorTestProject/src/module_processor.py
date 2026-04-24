@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 # 7个核心模块列表(按处理顺序)
 MODULES = [
-    "parameter_constraints",
     "basic_info",
+    "parameter_constraints",
     "inter_parameter_constraints",
     "platform_specifics",
     "other_parameters",

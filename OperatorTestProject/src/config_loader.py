@@ -15,7 +15,7 @@ class LLMProviderConfig(BaseModel):
 
     name: str
     type: str = Field(default="cli", description="provider接入方式: cli 或 interface")
-    provider: str = Field(default="codex", description="provider名称: codex/openai/anthropic/claude")
+    provider: str = Field(default="codex", description="provider名称: codex/openai/anthropic/zai/claude")
     base_url: Optional[str] = None
     api_key: str = ""
     model: str = ""

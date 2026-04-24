@@ -13,3 +13,4 @@ failed_doc/
 .venv/
 .uv-cache/
 logs/
+/examples/

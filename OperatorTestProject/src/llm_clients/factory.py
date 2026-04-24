@@ -14,6 +14,7 @@ def create_llm_client(config: LLMProviderConfig, app_root: Path) -> BaseLLMClien
     client_mapping = {
         ("interface", "openai"): OpenAIInterfaceClient,
         ("interface", "anthropic"): AnthropicInterfaceClient,
+        ("interface", "zai"): OpenAIInterfaceClient,
         ("cli", "codex"): CodexCLIClient,
         ("cli", "claude"): ClaudeCLIClient,
     }

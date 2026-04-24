@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+import re
 import shutil
 import subprocess
 import uuid
@@ -81,7 +82,70 @@ class BaseCLIClient(BaseLLMClient):
 
     def _extract_response_from_stdout(self, stdout_text: str) -> str:
         """从标准输出中提取最终回复"""
-        return stdout_text.strip()
+        text = stdout_text.strip()
+        if not text:
+            return ""
+
+        # 处理 ```json...``` 代码块
+        # 匹配 ```json 或 ``` 开头的代码块
+        json_block_pattern = r'```(?:json)?\s*\n?(.*?)\n?```'
+        matches = re.findall(json_block_pattern, text, re.DOTALL | re.IGNORECASE)
+
+        if matches:
+            # 如果找到代码块，提取第一个
+            extracted = matches[0].strip()
+            # 尝试找到完整的 JSON 对象/数组
+            if extracted.startswith('{') or extracted.startswith('['):
+                return self._extract_complete_json(extracted)
+            return extracted
+
+        # 如果没有代码块标记，尝试直接提取 JSON
+        if self._looks_like_json(text):
+            return self._extract_complete_json(text)
+
+        return text
+
+    def _looks_like_json(self, text: str) -> bool:
+        """检查文本是否看起来像 JSON"""
+        text = text.strip()
+        return text.startswith('{') or text.startswith('[')
+
+    def _extract_complete_json(self, text: str) -> str:
+        """提取完整的 JSON 对象或数组"""
+        text = text.strip()
+
+        # 如果是 JSON 对象
+        if text.startswith('{'):
+            brace_count = 0
+            start_idx = -1
+
+            for i, char in enumerate(text):
+                if char == '{':
+                    if start_idx == -1:
+                        start_idx = i
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0 and start_idx != -1:
+                        return text[start_idx:i+1]
+
+        # 如果是 JSON 数组
+        elif text.startswith('['):
+            bracket_count = 0
+            start_idx = -1
+
+            for i, char in enumerate(text):
+                if char == '[':
+                    if start_idx == -1:
+                        start_idx = i
+                    bracket_count += 1
+                elif char == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0 and start_idx != -1:
+                        return text[start_idx:i+1]
+
+        # 如果无法提取完整 JSON，返回原文本
+        return text
 
     def _format_error(self, stdout_text: str, stderr_text: str) -> str:
         """整合 CLI 输出，便于记录错误信息"""
@@ -223,11 +287,77 @@ class CodexCLIClient(BaseCLIClient):
         if not text:
             return ""
 
+        # 先处理特殊的 marker
         for marker in ("\nassistant\n", "\nfinal\n"):
             marker_index = text.rfind(marker)
             if marker_index != -1:
-                return text[marker_index + len(marker):].strip()
+                extracted_text = text[marker_index + len(marker):].strip()
+                # 对提取的文本进一步处理 JSON 代码块
+                return self._process_json_code_blocks(extracted_text)
 
+        # 如果没有找到 marker，直接处理整个文本
+        return self._process_json_code_blocks(text)
+
+    def _process_json_code_blocks(self, text: str) -> str:
+        """处理 JSON 代码块，移除 ```json 包围"""
+        # 处理 ```json...``` 代码块
+        json_block_pattern = r'```(?:json)?\s*\n?(.*?)\n?```'
+        matches = re.findall(json_block_pattern, text, re.DOTALL | re.IGNORECASE)
+
+        if matches:
+            # 如果找到代码块，提取第一个
+            extracted = matches[0].strip()
+            # 如果提取的内容是完整的 JSON，直接返回
+            if self._looks_like_json(extracted):
+                return self._extract_complete_json(extracted)
+            return extracted
+
+        # 如果没有代码块标记，尝试直接提取 JSON
+        if self._looks_like_json(text):
+            return self._extract_complete_json(text)
+
+        return text
+
+    def _looks_like_json(self, text: str) -> bool:
+        """检查文本是否看起来像 JSON"""
+        text = text.strip()
+        return text.startswith('{') or text.startswith('[')
+
+    def _extract_complete_json(self, text: str) -> str:
+        """提取完整的 JSON 对象或数组"""
+        text = text.strip()
+
+        # 如果是 JSON 对象
+        if text.startswith('{'):
+            brace_count = 0
+            start_idx = -1
+
+            for i, char in enumerate(text):
+                if char == '{':
+                    if start_idx == -1:
+                        start_idx = i
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0 and start_idx != -1:
+                        return text[start_idx:i+1]
+
+        # 如果是 JSON 数组
+        elif text.startswith('['):
+            bracket_count = 0
+            start_idx = -1
+
+            for i, char in enumerate(text):
+                if char == '[':
+                    if start_idx == -1:
+                        start_idx = i
+                    bracket_count += 1
+                elif char == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0 and start_idx != -1:
+                        return text[start_idx:i+1]
+
+        # 如果无法提取完整 JSON，返回原文本
         return text
 
 
