@@ -14,3 +14,4 @@ failed_doc/
 .uv-cache/
 logs/
 /examples/
+/.claude/

@@ -13,6 +13,7 @@ from .config_loader import ConfigLoader
 from .llm_service import LLMService
 from .prompt_builder import PromptBuilder
 from .rule_loader import RuleLoader
+from .json_cleaner import parse_json_safely
 from .result_saver import ResultSaver
 from .path_utils import resolve_path
 from .exceptions import ModuleProcessingError
@@ -104,19 +105,23 @@ class ExtractionNode:
             else:
                 raise ModuleProcessingError(module, "LLM响应中未找到有效的JSON数据")
 
-        # 解析JSON响应
+        # 解析JSON响应（使用安全的解析方法）
         json_str = response[json_start:json_end]
-        try:
-            data = json.loads(json_str)
-            logger.debug(f"[{module}] JSON解析成功,数据大小: {len(json_str)} 字符")
 
-            # 👇 如果data是数组，转换为字典（根据模块类型）
-            if isinstance(data, list):
-                data = self._convert_array_to_dict(data, module)
+        # 使用安全的JSON解析，自动处理转义字符等问题
+        parse_success, parse_result = parse_json_safely(json_str, module)
 
-            return data
-        except json.JSONDecodeError as e:
-            raise ModuleProcessingError(module, f"JSON解析失败: {str(e)}")
+        if not parse_success:
+            raise ModuleProcessingError(module, f"JSON解析失败: {parse_result}")
+
+        data = parse_result
+        logger.debug(f"[{module}] JSON解析成功,数据大小: {len(json_str)} 字符")
+
+        # 👇 如果data是数组，转换为字典（根据模块类型）
+        if isinstance(data, list):
+            data = self._convert_array_to_dict(data, module)
+
+        return data
 
     def _convert_array_to_dict(
             self,

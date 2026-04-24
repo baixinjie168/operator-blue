@@ -25,6 +25,7 @@ from .common_model_definition import (
     InterParamConstraint,
     PlatformSpecific
 )
+from .json_cleaner import parse_json_safely
 
 # 获取logger
 logger = logging.getLogger(__name__)
@@ -151,13 +152,15 @@ class JsonToModelLoader:
             ...     fields_to_ignore={"functions", "parameter_constraints"})
         """
         try:
-            # 1. 解析JSON字符串
-            try:
-                json_data = json.loads(json_str)
-            except json.JSONDecodeError as e:
-                error_msg = f"JSON解析失败: {str(e)}\n位置: 第{e.lineno}行, 第{e.colno}列"
-                logger.error(error_msg)
+            # 1. 解析JSON字符串（使用安全的解析方法）
+            parse_success, parse_result = parse_json_safely(json_str, module_name)
+
+            if not parse_success:
+                error_msg = parse_result  # parse_result 包含错误信息
+                logger.error(f"[{module_name}] {error_msg}")
                 return None, error_msg
+
+            json_data = parse_result
 
             # 2. 获取模型类
             try:
