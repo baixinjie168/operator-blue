@@ -36,7 +36,7 @@ llm_interfaces:
     type: "cli"
     provider: "claude"
     command: "claude"
-    model: "claude-sonnet-4-6"
+    model: "glm-5.1"
     args: []
     options:
       prompt_transport: "stdin"
