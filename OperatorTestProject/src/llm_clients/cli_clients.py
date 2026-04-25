@@ -368,7 +368,12 @@ class ClaudeCLIClient(BaseCLIClient):
 
     def _build_base_args(self) -> List[str]:
         """构建 claude 基础参数"""
-        cli_args = [*self._resolved_command, "-p"]
+        cli_args = [
+            *self._resolved_command, "-p",
+            "--output-format", "json",
+            "--no-session-persistence",
+            "--dangerously-skip-permissions",
+        ]
 
         if self.config.model and self.config.options.get("use_model_arg", True):
             cli_args.extend(["--model", self.config.model])

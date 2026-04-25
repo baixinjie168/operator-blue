@@ -15,3 +15,5 @@ failed_doc/
 logs/
 /examples/
 /.claude/
+/.codeartsdoer/
+/docs/
