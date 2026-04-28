@@ -142,9 +142,9 @@ class ExtractionNode:
             根据模块类型，将数组包装成合适的字典格式
         """
         # 根据模块类型确定包装方式
-        if module == "param_constraints":
-            # param_constraints 模块期望格式: {"param_constraints": [...]}
-            return {"param_constraints": data}
+        if module == "parameter_constraints":
+            # parameter_constraints 模块期望格式: {"parameter_constraints": [...]}
+            return {"parameter_constraints": data}
         elif module == "functions":
             # functions 模块期望格式: {"functions": [...]}
             return {"functions": data}

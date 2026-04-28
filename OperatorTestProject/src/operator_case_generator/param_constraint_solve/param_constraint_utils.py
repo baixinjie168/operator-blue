@@ -34,10 +34,10 @@ class ParamSetValueFlag(BaseModel):
 
 class ParamConstraintUtils(CommonDispatcher):
     def __init__(self, case: CaseConfig, case_generate_instance: CaseGenerate,
-                 inter_param_constraints: List[InterParamConstraint], operator_rule_data: OperatorRule,
+                 inter_parameter_constraints: List[InterParamConstraint], operator_rule_data: OperatorRule,
                  param_combinations: Dict[str, ParameterPropertyData] = None,
                  is_generate_real_data: bool = False):
-        self.inter_param_constraints = inter_param_constraints
+        self.inter_parameter_constraints = inter_parameter_constraints
         # 形如{'x1': {'DType': 'BFLOAT16', 'DataProfile': 'NaN', 'DimCount': '2', 'DimProperty': 'Has_Large_Size',
         # 'DataProfile': 'SubNormal', 'Memory': 'Contiguous'}, 'epsilon': {'Value': '1e-5'},
         # 'additionalOutput': {'Mode': 'True'}}
@@ -55,7 +55,7 @@ class ParamConstraintUtils(CommonDispatcher):
         self.has_set_value_param = defaultdict(ParamSetValueFlag)
         self.customize_constraint_patch = CustomizeConstraintPatch(case=case,
                                                                    case_generate_instance=case_generate_instance,
-                                                                   inter_param_constraints=inter_param_constraints,
+                                                                   inter_parameter_constraints=inter_parameter_constraints,
                                                                    operator_rule_data=operator_rule_data,
                                                                    param_combinations=param_combinations,
                                                                    is_generate_real_data=is_generate_real_data)
@@ -94,7 +94,7 @@ class ParamConstraintUtils(CommonDispatcher):
         all_constraint_relations = [relation.value for relation in InterConstraintsRuleType]
         match_relations = []
         for relation in all_constraint_relations:
-            match_relation = [each for each in self.inter_param_constraints if each.type == relation]
+            match_relation = [each for each in self.inter_parameter_constraints if each.type == relation]
             if match_relation:
                 match_relations.extend(match_relation)
         customize_constraints = []
@@ -131,8 +131,8 @@ class ParamConstraintUtils(CommonDispatcher):
         :param param_name: 参数名称
         :return: List[dtype]
         """
-        param_constraints = self.operator_rule_data.parameter_constraints
-        for param_constraint in param_constraints:
+        parameter_constraints = self.operator_rule_data.parameter_constraints
+        for param_constraint in parameter_constraints:
             if param_constraint.name != param_name:
                 continue
             param_dtype_list = param_constraint.constraints.data_types
@@ -150,9 +150,9 @@ class ParamConstraintUtils(CommonDispatcher):
         :param param_name:参数名称
         :return: List
         """
-        param_constraints = self.operator_rule_data.parameter_constraints
+        parameter_constraints = self.operator_rule_data.parameter_constraints
         range_value_domain = []
-        for param_constraint in param_constraints:
+        for param_constraint in parameter_constraints:
             if param_constraint.name != param_name:
                 continue
             param_range_values = param_constraint.constraints.allowed_values
@@ -222,7 +222,7 @@ class ParamConstraintUtils(CommonDispatcher):
         if not relation_params:
             logger.error("Relation params is empty, can't solve param has determine value or not")
             return determine_value_expr_list
-        param_constraints_dict = {each.name: each.constraints for each in self.operator_rule_data.parameter_constraints}
+        parameter_constraints_dict = {each.name: each.constraints for each in self.operator_rule_data.parameter_constraints}
         has_add_shape_value_rule = False
         for param_name in relation_params:
             # 部分参数可能不在case_input_map中，需要在other_parameter中查找，将other中此参数的rule字段内容添加至约束集合
@@ -244,7 +244,7 @@ class ParamConstraintUtils(CommonDispatcher):
             # 需要把shape的当前取值添加到约束里，需要先判断是否满足rule规则，借助ast判断
             shape_current_value = self.case_input_map.get(param_name).shape
             is_shape_value_valid = True
-            param_shape_constraints = param_constraints_dict.get(param_name).shape
+            param_shape_constraints = parameter_constraints_dict.get(param_name).shape
             for shape_constraint in param_shape_constraints:
                 for shape_rule in shape_constraint.constraint:
                     shape_expr_list.append(shape_rule.rule)
@@ -256,7 +256,7 @@ class ParamConstraintUtils(CommonDispatcher):
                 shape_expr_list.append(f"{param_name}.shape == {shape_current_value}")
                 has_add_shape_value_rule = True
             # range_value属性约束添加
-            param_range_value_constraint = param_constraints_dict.get(param_name).allowed_values
+            param_range_value_constraint = parameter_constraints_dict.get(param_name).allowed_values
             for range_value_constraint in param_range_value_constraint:
                 for value_rule in range_value_constraint.value:
                     if isinstance(value_rule, list) and len(value_rule) >= 2:

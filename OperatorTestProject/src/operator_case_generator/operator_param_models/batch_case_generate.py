@@ -108,7 +108,7 @@ class OperatorCaseGenerator:
         """
         根据算子参数的约束条件修正参数取值
         self, case: CaseConfig, case_generate_instance: CaseGenerate,
-                     inter_param_constraints: List[InterParamConstraint], param_combinations: Dict,
+                     inter_parameter_constraints: List[InterParamConstraint], param_combinations: Dict,
                      is_generate_real_data: bool = False
         :param case: 算子用例对象
         :param param_combinations: 此用例生成时使用的参数组合信息，即pict输出的组合数据
@@ -117,10 +117,10 @@ class OperatorCaseGenerator:
         """
         operator_name = case.name
         params_role = self.get_params_roles(operator_name)
-        inter_param_constraints = operator_rule_instance.inter_parameter_constraints
+        inter_parameter_constraints = operator_rule_instance.inter_parameter_constraints
         case_generate_instance = CaseGenerate(operator_name=operator_name, params_role=params_role)
         param_constraint_patch = ParamConstraintUtils(case=case, case_generate_instance=case_generate_instance,
-                                                      inter_param_constraints=inter_param_constraints,
+                                                      inter_parameter_constraints=inter_parameter_constraints,
                                                       param_combinations=param_combinations,
                                                       operator_rule_data=operator_rule_instance)
         correct_status = param_constraint_patch.correct_operator_param()

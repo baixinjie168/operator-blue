@@ -112,9 +112,9 @@ class TestCaseGeneratorV2:
             raise ValueError(f"未找到包含GetWorkspaceSize的函数: {self.op_name}")
 
         # 从parameter_constraints中约束信息
-        param_constraints = {}
+        parameter_constraints = {}
         for param in self.config.get('parameter_constraints', []):
-            param_constraints[param['name']] = param
+            parameter_constraints[param['name']] = param
 
         # 从GetWorkspaceSize函数中提取输入参数
         for param in get_workspace_func.get('parameters', []):
@@ -125,7 +125,7 @@ class TestCaseGeneratorV2:
             # 只处理输入参数
             if role == "input":
                 # 获取参数约束
-                constraints = param_constraints.get(name, {}).get('constraints', {})
+                constraints = parameter_constraints.get(name, {}).get('constraints', {})
 
                 # 获取数据类型
                 data_types = []

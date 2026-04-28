@@ -26,10 +26,10 @@ class CustomizeConstraintPatch(CommonDispatcher):
     """
 
     def __init__(self, case: CaseConfig, case_generate_instance: CaseGenerate,
-                 inter_param_constraints: List[InterParamConstraint], operator_rule_data: OperatorRule,
+                 inter_parameter_constraints: List[InterParamConstraint], operator_rule_data: OperatorRule,
                  param_combinations: Dict[str, ParameterPropertyData] = None,
                  is_generate_real_data: bool = False):
-        self.inter_param_constraints = inter_param_constraints
+        self.inter_parameter_constraints = inter_parameter_constraints
         # 形如{'x1': {'DType': 'BFLOAT16', 'DataProfile': 'NaN', 'DimCount': '2', 'DimProperty': 'Has_Large_Size',
         # 'DataProfile': 'SubNormal', 'Memory': 'Contiguous'}, 'epsilon': {'Value': '1e-5'},
         # 'additionalOutput': {'Mode': 'True'}}
