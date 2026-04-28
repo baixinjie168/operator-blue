@@ -104,18 +104,14 @@ class PlatformSpecific(BaseModel):
 - 优先从“约束说明”“限制”“注意事项”“平台差异”“硬件要求”“支持矩阵”等章节提取。
 - 也要检查参数说明、功能说明、补充说明中的平台特定句子。
 - 凡是出现“某平台支持/不支持”“某平台仅支持”“某平台要求”“某平台下无效”等表述，都应考虑是否属于 `platform_specifics`。
+- 单参数数据类型支持表只有在不同平台确实存在差异时才属于本模块；如果所有支持平台一致，应要求移到 `parameter_constraints`。
 
 ### 2. 与全局规则的边界
 
 - 只在特定平台成立的限制，放入 `platform_specifics`。
 - 对所有平台都成立的输入输出约束、shape 关系、dtype 关系，不应放入 `platform_specifics`。
+- 校验时要区分平台差异和全局规则；对所有已支持平台都成立的 dtype、shape、format、memory、broadcast 约束，不应出现在 `platform_specifics`。
 - 不要把本应写进 `parameter_constraints`、`inter_parameter_constraints` 或 `dtype_map` 的全局规则误归到这里。
-
-**全局约束移出 platform_specifics 校验**：
-- **删除全局 shape/连续性/格式约束**：全局性的约束应移到全局参数约束字段，`platform_specifics` 仅保留平台间存在差异的内容。
-- **删除全局 dtype 一致性/推导规则**：如 `out.dtype == self.dtype` 等全局一致的规则应移到全局约束位置。
-- **删除全局参数说明/输出说明**：全局通用的参数语义说明不应出现在 `platform_specifics` 中。
-- **仅保留平台特有的 dtype 支持差异**：如 BFLOAT16 仅 A2/A3 支持，全局通用的类型集合移出。
 
 ### 3. 规则拆分与合并
 
@@ -124,41 +120,17 @@ class PlatformSpecific(BaseModel):
 - 如果一段描述里同时包含多条独立要求，应按语义拆分，避免一条记录过于混杂。
 - 同一平台下语义完全重复的记录不要重复出现。
 - 支持矩阵、dtype 限制、模式开关等不同语义的规则，不应强行挤进同一条记录。
+- 如果同一平台下既有“是否支持”又有 dtype 不支持、模式开关、字节对齐等限制，应检查是否拆分清楚；混成一条导致语义边界不清时应报错。
 
 ### 4. 平台差异表达
 
 - 数据类型支持差异、尾轴字节要求、某些输出无效、组合支持矩阵等，都属于典型的平台特异性规则。
 - 文档中如果明确按平台给出支持矩阵，应在 `description` 中保留完整信息。
+- 产品支持矩阵要检查是否补全所有明确列出的平台，尤其是不支持平台；遗漏 `Atlas 200I/500 A2 推理产品` 等明确不支持项应报错。
 - `constraint_detail` 能表达时再表达，不能稳定表达时宁可留空字符串，也不要编造错误规则。
+- `description` 应保留平台规则的人类可读语义，`constraint_detail` 只写简洁可判定表达式；长段自然语言、JSON、数组或多个混杂规则都不合格。
+- 如果只是平台支持状态，允许 `constraint_detail` 使用统一的支持状态表达或空字符串；不要把 `supported == true/false` 当成 dtype、shape 等参数约束。
 - 如果文档已经明确列出多个平台的支持/不支持状态，校验时应检查结果是否遗漏任何已明确给出的平台项。
-
-**constraint_detail 可解析表达式补充校验**：
-- **支持状态为"支持"时，补充可判定表达式**：`constraint_detail` 应补充为 `supported == true` 等可解析布尔表达式。
-- **支持状态为"不支持"时，补充可判定表达式**：`constraint_detail` 应补充为 `supported == false` 等可解析布尔表达式。
-- **constraint_detail 与 description 语义必须一致**：补充的表达式必须与 `description` 的语义保持一致。
-- **无法稳定表达时置空**：若规则过于复杂或无法稳定转写为可解析表达式，`constraint_detail` 应置为空字符串 `""`。
-
-**精确性与语义规范校验**：
-- **可选参数须加空值保护**：对可选参数，`constraint_detail` 中应使用 `(param is None or param.dtype != 'BFLOAT16')` 形式的条件表达式。
-- **不要把"允许"写成"必须"**：如"允许降精度到 HFLOAT16"不应写成强制等式判断，应改为非强制的能力描述或置空 `constraint_detail`。
-- **使用条件蕴含式表达 cubeMathType 规则**：如 `cubeMathType != 1 or input.dtype != 'FLOAT' or compute_dtype == 'HFLOAT16'`。
-- **不要覆盖文档未明确的分支**：`constraint_detail` 只表达文档已明确说明的正向条件。
-- **FLOAT 应统一为 FLOAT32**：`constraint_detail` 中出现的 `'FLOAT'` 应改为 `'FLOAT32'`。
-
-**确定性计算与特殊约束处理校验**：
-- **确定性计算条件须显式表达**：当规则仅在"开启确定性计算时"生效，`description` 应补充该前提，`constraint_detail` 增加确定性开关条件。
-- **超时/性能风险用 description 保留**：`constraint_detail` 可写为参数范围表达式或置空，`description` 保留原始风险说明。
-
-### 5. 产品支持情况矩阵补全校验
-
-- **补充缺失平台的支持/不支持记录**：当文档"产品支持情况"表格中列出的平台在 `platform_specifics` 中缺失时，应补充对应记录。
-- **支持状态记录与 dtype 规则分开**：产品支持/不支持的判断记录应与 dtype 支持范围规则分开存放。
-- **保留文档原始平台写法与 √/× 语义**：`description` 中应明确写出"是否支持：√/×"，`constraint_detail` 用可解析表达式表达。
-
-### 6. 记录拆分与结构规范校验
-
-- **一条记录只表达一种独立规则**：若同一元素包含多条独立规则，应拆分为多条记录。
-- **不同接口的规则分开建模**：应在 `description` 或 `constraint_detail` 中明确接口范围，或拆分到不同记录。
 
 ## 通用规则
 
