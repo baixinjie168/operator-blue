@@ -1,0 +1,498 @@
+{
+  "operation_name": "aclnnMaxDim",
+  "description": "返回Tensor指定维度的最大值及其索引位置。最大值保存到out中，最大值的索引保存到indices中。如果keepdim为false，则不保留对应的轴；如果为true，则保留指定轴的维度值为1。",
+  "api_flow": "two-step",
+  "parameter_constraints": [
+    {
+      "name": "self",
+      "constraints": {
+        "shape": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "constraint": [
+              {
+                "structure": "dims",
+                "rule": "1 <= len(self.shape) <= 8",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "constraint": [
+              {
+                "structure": "dims",
+                "rule": "1 <= len(self.shape) <= 8",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          }
+        ],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "types": [
+              "FLOAT",
+              "FLOAT16",
+              "INT64",
+              "BOOL"
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "FLOAT",
+              "FLOAT16",
+              "INT64",
+              "BOOL",
+              "BFLOAT16"
+            ]
+          }
+        ],
+        "memory": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "discontinuous": true
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "discontinuous": true
+          }
+        ],
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "dim",
+      "constraints": {
+        "shape": [],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "INT64"
+            ]
+          }
+        ],
+        "memory": null,
+        "allowed_values": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "value": [
+              [
+                -8,
+                7
+              ]
+            ]
+          }
+        ],
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "keepdim",
+      "constraints": {
+        "shape": [],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "BOOL"
+            ]
+          }
+        ],
+        "memory": null,
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "out",
+      "constraints": {
+        "shape": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "constraint": [
+              {
+                "structure": "dims",
+                "rule": "len(out.shape) == len(self.shape) if keepdim else len(out.shape) == len(self.shape) - 1",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              },
+              {
+                "structure": "axis_value",
+                "rule": "out.shape == self.shape if keepdim else out.shape == tuple(s for i, s in enumerate(self.shape) if i != dim)",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "constraint": [
+              {
+                "structure": "dims",
+                "rule": "len(out.shape) == len(self.shape) if keepdim else len(out.shape) == len(self.shape) - 1",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              },
+              {
+                "structure": "axis_value",
+                "rule": "out.shape == self.shape if keepdim else out.shape == tuple(s for i, s in enumerate(self.shape) if i != dim)",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          }
+        ],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "types": [
+              "FLOAT",
+              "FLOAT16",
+              "INT64",
+              "BOOL"
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "FLOAT",
+              "FLOAT16",
+              "INT64",
+              "BOOL",
+              "BFLOAT16"
+            ]
+          }
+        ],
+        "memory": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "discontinuous": true
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "discontinuous": true
+          }
+        ],
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "indices",
+      "constraints": {
+        "shape": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "constraint": [
+              {
+                "structure": "axis_value",
+                "rule": "indices.shape == out.shape",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "constraint": [
+              {
+                "structure": "axis_value",
+                "rule": "indices.shape == out.shape",
+                "dim_num": null,
+                "dim_valid_value": null,
+                "dim_invalid_value": null
+              }
+            ]
+          }
+        ],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "types": [
+              "BOOL",
+              "FLOAT32",
+              "FLOAT16",
+              "INT8",
+              "INT16",
+              "UINT16",
+              "UINT8",
+              "INT32",
+              "INT64",
+              "UINT32",
+              "UINT64",
+              "DOUBLE",
+              "COMPLEX64",
+              "COMPLEX128"
+            ]
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "BOOL",
+              "FLOAT32",
+              "FLOAT16",
+              "INT8",
+              "INT16",
+              "UINT16",
+              "UINT8",
+              "INT32",
+              "INT64",
+              "UINT32",
+              "UINT64",
+              "DOUBLE",
+              "COMPLEX64",
+              "COMPLEX128",
+              "BFLOAT16"
+            ]
+          }
+        ],
+        "memory": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+            "discontinuous": true
+          },
+          {
+            "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "discontinuous": true
+          }
+        ],
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "workspaceSize",
+      "constraints": {
+        "shape": [],
+        "data_types": [
+          {
+            "platform": "Atlas 推理系列产品、Atlas 训练系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+            "types": [
+              "UINT64"
+            ]
+          }
+        ],
+        "memory": null,
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "executor",
+      "constraints": {
+        "shape": [],
+        "data_types": [],
+        "memory": null,
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "workspace",
+      "constraints": {
+        "shape": [],
+        "data_types": [],
+        "memory": null,
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    },
+    {
+      "name": "stream",
+      "constraints": {
+        "shape": [],
+        "data_types": [],
+        "memory": null,
+        "allowed_values": null,
+        "not_allowed_values": null
+      }
+    }
+  ],
+  "inter_parameter_constraints": [
+    {
+      "type": "type_equality",
+      "params": [
+        "self",
+        "out"
+      ],
+      "expr": "self.dtype == out.dtype",
+      "description": "out的数据类型必须和self一致",
+      "source": "self",
+      "target": [
+        "out"
+      ]
+    },
+    {
+      "type": "shape_dependency",
+      "params": [
+        "self",
+        "dim",
+        "keepdim",
+        "out",
+        "indices"
+      ],
+      "expr": "(out.ndim == self.ndim - 1 if not keepdim else out.ndim == self.ndim) and out.shape == indices.shape",
+      "description": "out和indices的形状由self、dim和keepdim决定：如果keepdim为false，输出维度为self维度减1；如果keepdim为true，输出维度等于self维度；且out和indices形状相同",
+      "source": "self",
+      "target": [
+        "out",
+        "indices"
+      ]
+    },
+    {
+      "type": "shape_equality",
+      "params": [
+        "out",
+        "indices"
+      ],
+      "expr": "out.shape == indices.shape",
+      "description": "out和indices必须具有相同的形状",
+      "source": null,
+      "target": null
+    }
+  ],
+  "platform_specifics": [
+    {
+      "platform": "Atlas 200I/500 A2 推理产品",
+      "description": "该产品不支持aclnnMaxDim算子。",
+      "constraint_detail": "operator_supported == false"
+    },
+    {
+      "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+      "description": "self和out的数据类型支持FLOAT、FLOAT16、INT64、BOOL，不支持BFLOAT16。",
+      "constraint_detail": "dtype in [FLOAT, FLOAT16, INT64, BOOL] and BFLOAT16 not supported"
+    },
+    {
+      "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+      "description": "self和out的数据类型支持FLOAT、FLOAT16、INT64、BOOL、BFLOAT16。",
+      "constraint_detail": "dtype in [FLOAT, FLOAT16, INT64, BOOL, BFLOAT16]"
+    },
+    {
+      "platform": "Atlas 推理系列产品、Atlas 训练系列产品",
+      "description": "indices的数据类型支持BOOL、FLOAT32、FLOAT16、INT8、INT16、UINT16、UINT8、INT32、INT64、UINT32、UINT64、DOUBLE、COMPLEX64、COMPLEX128，不支持BFLOAT16。",
+      "constraint_detail": "dtype in [BOOL, FLOAT32, FLOAT16, INT8, INT16, UINT16, UINT8, INT32, INT64, UINT32, UINT64, DOUBLE, COMPLEX64, COMPLEX128] and BFLOAT16 not supported"
+    },
+    {
+      "platform": "Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品",
+      "description": "indices的数据类型支持BOOL、FLOAT32、FLOAT16、INT8、INT16、UINT16、UINT8、INT32、INT64、UINT32、UINT64、DOUBLE、COMPLEX64、COMPLEX128、BFLOAT16。",
+      "constraint_detail": "dtype in [BOOL, FLOAT32, FLOAT16, INT8, INT16, UINT16, UINT8, INT32, INT64, UINT32, UINT64, DOUBLE, COMPLEX64, COMPLEX128, BFLOAT16]"
+    }
+  ],
+  "other_parameters": [],
+  "functions": [
+    {
+      "api_name": "aclnnMaxDimGetWorkspaceSize",
+      "description": "第一段接口，获取计算所需workspace大小以及包含了算子计算流程的执行器。",
+      "parameters": [
+        {
+          "name": "self",
+          "role": "input",
+          "type": "aclTensor",
+          "is_optional": false,
+          "description": "Device侧的aclTensor。支持非连续的Tensor，数据格式支持ND。支持[1, 8]维。Atlas 推理系列产品、Atlas 训练系列产品：数据类型支持FLOAT、FLOAT16、INT64、BOOL；Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品：数据类型支持FLOAT、FLOAT16、INT64、BOOL、BFLOAT16",
+          "format": "ND"
+        },
+        {
+          "name": "dim",
+          "role": "input",
+          "type": "int64_t",
+          "is_optional": false,
+          "description": "指定的维度，数据类型为INT64，取值范围在[-self.dim(), self.dim())。",
+          "format": null
+        },
+        {
+          "name": "keepdim",
+          "role": "input",
+          "type": "bool",
+          "is_optional": false,
+          "description": "reduce轴的维度是否保留，数据类型为BOOL。",
+          "format": null
+        },
+        {
+          "name": "out",
+          "role": "output",
+          "type": "aclTensor",
+          "is_optional": false,
+          "description": "Device侧的aclTensor，且数据类型和self一致。支持非连续的Tensor，数据格式支持ND。如果keepdim为false，则输出维度为self维度减1；如果keepdim为true，则输出维度等于self维度。Atlas 推理系列产品、Atlas 训练系列产品：数据类型支持FLOAT、FLOAT16、INT64、BOOL；Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品：数据类型支持FLOAT、FLOAT16、INT64、BOOL、BFLOAT16",
+          "format": "ND"
+        },
+        {
+          "name": "indices",
+          "role": "output",
+          "type": "aclTensor",
+          "is_optional": false,
+          "description": "Device侧的aclTensor。支持非连续的Tensor，数据格式支持ND。Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品：数据类型支持BOOL、FLOAT32、FLOAT16、INT8、INT16、UINT16、UINT8、INT32、INT64、UINT32、UINT64、DOUBLE、COMPLEX64、COMPLEX128、BFLOAT16；Atlas 推理系列产品、Atlas 训练系列产品：数据类型支持BOOL、FLOAT32、FLOAT16、INT8、INT16、UINT16、UINT8、INT32、INT64、UINT32、UINT64、DOUBLE、COMPLEX64、COMPLEX128",
+          "format": "ND"
+        },
+        {
+          "name": "workspaceSize",
+          "role": "output",
+          "type": "uint64_t",
+          "is_optional": false,
+          "description": "返回需要在Device侧申请的workspace大小。",
+          "format": null
+        },
+        {
+          "name": "executor",
+          "role": "output",
+          "type": "aclOpExecutor",
+          "is_optional": false,
+          "description": "返回op执行器，包含了算子计算流程。",
+          "format": null
+        }
+      ]
+    },
+    {
+      "api_name": "aclnnMaxDim",
+      "description": "第二段接口，执行计算。",
+      "parameters": [
+        {
+          "name": "workspace",
+          "role": "input",
+          "type": "void",
+          "is_optional": false,
+          "description": "在Device侧申请的workspace内存地址。",
+          "format": null
+        },
+        {
+          "name": "workspaceSize",
+          "role": "input",
+          "type": "uint64_t",
+          "is_optional": false,
+          "description": "在Device侧申请的workspace大小，由第一段接口aclnnMaxDimGetWorkspaceSize获取。",
+          "format": null
+        },
+        {
+          "name": "executor",
+          "role": "input",
+          "type": "aclOpExecutor",
+          "is_optional": false,
+          "description": "op执行器，包含了算子计算流程。",
+          "format": null
+        },
+        {
+          "name": "stream",
+          "role": "input",
+          "type": "aclrtStream",
+          "is_optional": false,
+          "description": "指定执行任务的Stream。",
+          "format": null
+        }
+      ]
+    }
+  ],
+  "dtype_map": []
+}
