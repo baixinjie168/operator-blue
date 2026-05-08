@@ -10,3 +10,45 @@
 bash
 claude -p "你的问题" --output-format stream-json --verbose --include-partial-messages | \
   jq -rj 'select(.type == "stream_event" and .event.delta.type? == "text_delta") | .event.delta.text'
+
+
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: batch_entry.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/batch_entry.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false,
+      "args": []
+    },
+    {
+      "name": "Python: batch_entry.py (--stop-on-error)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/batch_entry.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false,
+      "args": [
+        "--stop-on-error"
+      ]
+    },
+    {
+      "name": "Python: concurrent_batch_entry.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/concurrent_batch_entry.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false,
+      "args": []
+    }
+  ]
+}
+```
